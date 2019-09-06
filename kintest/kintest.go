@@ -1,6 +1,7 @@
 package kintest
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -28,6 +29,7 @@ func Run() {
 	for i := 0; i < 20; i++ {
 		// Use random string as partition key to ensure even distribution across shards
 		err := worker.Publish(streamName, utils.RandStringBytesMaskImpr(10), []byte("hello world"))
+		fmt.Printf("Creating record %v \n", i)
 		if err != nil {
 			log.Printf("Errorin Publish. %+v", err)
 		}

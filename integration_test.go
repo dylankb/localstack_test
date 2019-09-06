@@ -19,35 +19,34 @@ type KinesisTestHelper struct {
 
 var testHelper KinesisTestHelper
 
-// var _ = BeforeSuite(func() {
-// 		fmt.Println("~~BEFORE")
-// 		testHelper.streamName = "localstack_stream"
+var _ = BeforeSuite(func() {
+	fmt.Println("~~BEFORE")
+	testHelper.streamName = "localstack_stream"
 
-// 		kinesisAwsSession, err := newAWSSession("http://localhost:4568", "us-west-2")
-// 		Expect(err).ToNot(HaveOccurred())
+	kinesisAwsSession, err := newAWSSession("http://localhost:4568", "us-west-2")
+	Expect(err).ToNot(HaveOccurred())
 
-// 		testHelper.kinesisClient = kinesis.New(kinesisAwsSession)
+	testHelper.kinesisClient = kinesis.New(kinesisAwsSession)
 
-// 		streamInput := &kinesis.CreateStreamInput{
-// 			ShardCount: aws.Int64(1),
-// 			StreamName: aws.String(testHelper.streamName),
-// 		}
+	streamInput := &kinesis.CreateStreamInput{
+		ShardCount: aws.Int64(1),
+		StreamName: aws.String(testHelper.streamName),
+	}
 
-// 		output, err := testHelper.kinesisClient.CreateStream(streamInput)
-// 		Expect(err).ToNot(HaveOccurred())
-// 		Expect(output).ToNot(BeNil())
-// 	})
-// })
+	output, err := testHelper.kinesisClient.CreateStream(streamInput)
+	Expect(err).ToNot(HaveOccurred())
+	Expect(output).ToNot(BeNil())
+})
 
-// var _ = AfterSuite(func() {
-// 	fmt.Println("~~AFTER")
-// 	streamInput := &kinesis.DeleteStreamInput{
-// 		StreamName: aws.String(testHelper.streamName),
-// 	}
+var _ = AfterSuite(func() {
+	fmt.Println("~~AFTER")
+	streamInput := &kinesis.DeleteStreamInput{
+		StreamName: aws.String(testHelper.streamName),
+	}
 
-// 	_, err := testHelper.kinesisClient.DeleteStream(streamInput)
-// 	Expect(err).To(Not(HaveOccurred()))
-// })
+	_, err := testHelper.kinesisClient.DeleteStream(streamInput)
+	Expect(err).To(Not(HaveOccurred()))
+})
 
 var _ = Describe("Kinesis records", func() {
 	It("is set up correctly", func() {
@@ -70,15 +69,18 @@ var _ = Describe("Kinesis records", func() {
 	})
 
 	It("can retrieve records from kinesis stream", func() {
-		fmt.Println("~~CREATE EVENTS")
+		// fmt.Println("~~WAITING TO CREATE RECORDS...")
+		// timeout := 5 * time.Second
+		// time.Sleep(timeout)
+		fmt.Println("~~CREATING")
 		kintest.Run()
 
 		expectRecords := func(recordsOutput *kinesis.GetRecordsOutput) {
 			for i := range recordsOutput.Records {
-				fmt.Printf("Record %v \n", i)
+				fmt.Printf("Reading record %v \n", i)
 			}
-			// Expect(len(recordsOutput.Records)).ToNot(BeZero())
-			// Expect(len(recordsOutput.Records)).To(Equal(10))
+			Expect(len(recordsOutput.Records)).ToNot(BeZero())
+			Expect(len(recordsOutput.Records)).To(Equal(20))
 		}
 
 		retrieveStreamRecords(expectRecords)
